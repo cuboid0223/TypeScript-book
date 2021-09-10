@@ -9,23 +9,7 @@ TypeScript-先苦後甘
 <!-- # TypeScript-麥擱 console.log -->
 
 <!-- Put the link to this slide here so people can follow -->
-slide: https://hackmd.io/p/template-Talk-slide
-gitHub repo: 
-<style>
-code.blue {
-  color: #337AB7 !important;
-}
-code.orange {
-  color: #F7A004 !important;
-  font-size: 20px !important;
-}
-
-code.bgc-alert{
-    background-color: #F7A004 !important;
-    color: white !important;
-    font-weight: 400 !important;
-}
-</style>
+gitHub repo:  https://github.com/cuboid0223/TypeScript-book
 
 
 我誰?
@@ -49,10 +33,12 @@ code.bgc-alert{
 - JavaScript == 噴火龍
 
 ![image alt](https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Unofficial_JavaScript_logo_2.svg/100px-Unofficial_JavaScript_logo_2.svg.png)
+
 ![image alt](http://g.udn.com.tw/upfiles/B_RA/railwayTaiwan/PSN_PHOTO/331/f_18272331_1.png =100x100)
 - TypeScript == 超級噴火龍X
 
 ![image alt](https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Typescript_logo_2020.svg/100px-Typescript_logo_2020.svg.png)
+
 ![image alt](https://tw.portal-pokemon.com/play/resources/pokedex/img/pm/ca3db4aad5c85a525d9be86852b26db1db7a22c0.png =100x100)
 - Type System == 噴火龍進化石Ｘ
 
@@ -146,13 +132,19 @@ greet("hello world")
 // greet(123)
 ```
 
-開始編譯
+開始編譯前
+先下載 VScode 插件 codeRunner
 ```
-$> tsc hello.ts
+$> npm install -g ts-node
+
+$> npm install @types/node --save-dev
 ```
+
 :::info
-1. 型別提示（Type hint）:將滑鼠移動到變數或函式等會跳出型別方面的內容提示
+1. ==型別提示（Type hint）:將滑鼠移動到變數或函式等會跳出型別方面的內容提示==
 2.  之後看到 " $> " 開頭的程式碼，就是在終端機輸入～
+
+
 :::
 
 
@@ -557,8 +549,8 @@ bug
 :::
 範例程式：
 ```typescript=
-let numOrString = number | string
-let numAndString = number & string
+let numOrString: number | string
+let numAndString: number & string
 ```
 > numOrString 顧名思義就是可以指派 number 或 string
 > 
@@ -568,42 +560,320 @@ let numAndString = number & string
 ---
 
 
+第三章 - 深入型別系統 I (基礎篇)
+---
 
-```typescript
-// in background script
-const fakeLogin = async () => true
+### 3.1.1 TypeScript 編譯設定檔
 
-channel.answer('isLogin', async () => {
-  return await fakeLogin()
-})
+```
+>$ tsc --init
+```
+> 會產生 tsconfig.json 的設定檔
+> 
+> 不同的編譯設定會造就不同的 TypeScript 編譯規則與條件
+
+---
+
+### 3.1.2 型別化名（Type Alias）
+:::info
+給一個型別或型別組合一個新名稱
+:::
+
+> 之前介紹的 JSON 物件型別
+```typescript=
+const info:{
+    name: string,
+    age: number,
+    interest: string[] 
+} = {
+    name: 'Cuboid',
+    age: 18,
+    interest: ['drawing', 'programming'] 
+}
+
+```
+> 透過型別化名，解決上方冗長的寫法
+範例程式：
+```typescript=
+type UserInfo = {
+    name: string,
+    age: number,
+    interest: string[]
+};
+
+const info: userInfo = {
+    name: 'Cuboid',
+    age: 18,
+    interest: ['drawing', 'programming'] 
+}
+
 ```
 
-<br>
+---
 
-```typescript
-// in inject script
-const isLogin = await channel.callBackground('isLogin')
-console.log(isLogin) //-> true
+### 3.2.1 型別推論機制
+> 理解推論機制並不難，就是用原生 JS 
+1. 傳遞性
+```typescript=
+let num = 123;
+let whatTheType = num;
+```
+> 此時的 foo 會被推論為 number 型別，即 TypeScript 會傳遞型別 
+
+2. 匯集性
+```typescript=
+let whatIsThis = (Math.random() > 0.5) ? 123 : '123';
+```
+> 此時推論出來的型別會以邏輯（or），即 聯集型別 來表示
+> 
+3. 固定性
+```typescript=
+let num_321 = 123;
+num_321 = 456;
+num_321 = 'Hello World';
+```
+> 此時最後一行會報錯，經推論過後的變數就只會固定接收該型別下的任何值
+
+---
+
+### 3.2.2 型別註記機制
+
+
+---
+
+## 3.3 JSON 物件型別
+### 3.3.3 物件的完整性不能被動搖
+```typescript=
+let info_323 = {
+  name: "Cuboid",
+  age: 20,
+  interest: ["programming", "Gulu Gulu"],
+};
+
+// 新增屬性
+// info_323.email = "myMail@gmail.com"; // 報錯
+
+// 刪除屬性
+// delete info_323.name;
+// https://stackoverflow.com/questions/63702057/what-is-the-logic-behind-the-typescript-error-the-operand-of-a-delete-operato
+
+// 覆寫
+info_323.name = 'Cube'; 
+
+
+// 完全覆寫
+info_323 = {
+    name: 'Cuboid',
+    age: info_323.age,
+    interest: info_323.interest
+}
+
+// ES7 rest-spread
+info_323 = {...info_323, name:'May'}
+
 ```
 
----
-
-# :100: :muscle: :tada:
-
----
-
-### Wrap up
-
-- Cross envornment commnication
-- A small library to solve messaging pain
-- TypeScript Rocks :tada: 
+> 一但變數被推論為 JSON 物件時，必須遵守以下規則
+> 1. 不能任意新增、刪除 屬性
+> 2. 覆寫俵特定屬性或方法時，覆寫之值的型別不能跟推論出來的型別衝突
+> 3. 覆寫掉整個 JSON 物件值，其型別結構不能與原先的型別結構衝突
+>
+> 簡言之，不能夠對物件造成結構上的破壞，需保持物件的完整性
 
 ---
 
-### Thank you! :sheep: 
+### 3.3.4 選用屬性 Optional Property
+從上一節可以看出， TypeScript 對 JSON 物件十分嚴格，因此會有一個機制，較為鬆散的 JSON 物件
 
-You can find me on
+```typescript=
+type personalInfo = {
+    name: string,
+    age?: number,
+    interest: string[]
+}
 
-- GitHub
-- Twitter
-- or email me
+
+let info_334: personalInfo = {
+    name: 'Cuboid',
+    interest: ['gulu', 'gulu']
+}
+```
+
+> 可以看到 age 多了一個 “ ? ”
+> 查看 personalInfo 的結構可以發現屬性 age 對應 number | undefined 進行聯集的復合動作， **TypeScript 會認為 age 這個屬性是可以忽略的**
+
+
+對比上方程式碼，下方這個意思是指
+**age 這個屬性一定得被指派且型別可以是 number 或 undefined 型別**
+
+```typescript=+
+type personalInfo2 = {
+  name: string;
+  age: number | undefined;
+  interest: string[];
+};
+
+let info_334_2: personalInfo2 = {
+  name: "Cuboid",
+  interest: ["gulu", "gulu"],
+}; // 報錯
+```
+:::danger
+類型 '{ name: string; interest: string[]; }' 缺少屬性 'age'，但類型 'personalInfo2' 必須有該屬性
+:::
+
+---
+
+### 3.3.5 唯讀屬性 Read-Only Property
+避免開發者擅自覆寫屬性
+```typescript=
+type PersonalInfo = {
+    name: string,
+    readonly age: number,
+    interest: string[]
+}
+
+let info_335: PersonalInfo = {
+    name: 'Cuboid',
+    age: 18,
+    interest: ['gulu', 'gulu']
+}
+
+info_335.age = 20; // 報錯
+```
+:::danger
+因為 'age' 為唯讀屬性，所以無法指派至 'age'
+:::
+
+---
+
+## 3.4 函式型別
+### 3.4.1 函式型別 - 推論機制 
+函式型別會依照 return 的值去推論
+
+範例程式：
+```typescript=
+function numberOrString() {
+    const probability = Math.random()
+
+    if(probability > 0.5){
+        return probability
+    }else{
+        return probability.toString()
+    }
+}
+
+numberOrString();
+```
+:::info
+function numberOrString(): string | number
+:::
+
+改成回傳 42 
+```typescript=
+function numberOrString() {
+    const probability = Math.random()
+
+    if(probability > 0.5){
+        return 42
+    }else{
+        return '42'
+    }
+}
+
+numberOrString();
+```
+:::info
+function numberOrString(): 42 | "42"
+:::
+
+
+若沒有 回傳值，型別會是 void
+
+
+```typescript=
+function greeting(){
+    console.log('hello')
+}
+```
+:::info
+function greeting(): void
+:::
+
+### 3.4.2 函式型別 - 註記機制 
+**大多數函式宣告時，輸入型別（參數）必須註記，因為輸入會無條件推論為 any 型別，輸出(return 值)則可以在開發過程註記確保實作過程符合註記時預期的型別效果**
+
+```typescript=
+function returnNumber(number){
+    return number;
+}
+```
+:::danger
+參數 'number' 隱含了 'any' 類型
+:::
+
+---
+
+### 3.4.3 函式型別 - 選用參數
+
+```typescript=
+function increment(input1:number, input2?:number){
+    return input1 + (input2 ? input2 : 1);
+}
+
+increment(223,321)
+increment(112)
+```
+函式的輸入部分宣告時，可以宣告選用參數，代表該函式被呼叫時，選用**參數部分不一定需要代入值**
+:::info
+查看 input2 型別：
+
+(parameter) input2: number | undefined
+:::
+
+---
+
+### 3.4.4 函式型別 - 預設參數
+選用參數時常搭配預設參數，例如上面的程式碼 input2 需處理 undefined 的情況，也就是呼叫 increment 省略第二個參數
+
+```javascript=
+function increment(input1:number, input2:number=1){
+    return input1 + input2;
+}
+
+increment(223,321)
+increment(112)
+```
+
+透過預設參數，使程式碼更加簡潔
+
+
+---
+## 3.5 陣列型別
+
+### 3.5.2 陣列型別 - 註記機制 
+
+```typescript=
+
+const fibSeq: number[] = [1,1,2,3,5,8,11]
+
+// 二維陣列註記
+const points: number[][] = [[1,1,2],[3,5,8]]
+
+// 宣告數字或字串型別的陣列
+const arr: (number | string)[] = [123, 'hello', 'typeScript']
+
+// 空串列 一定得要註記，沒註記，空串列會被推定為 any 型別
+const emptyArr:number[] = []
+```
+
+:::warning
+空串列 一定得要註記，沒註記，空串列會被推定為 any 型別
+:::
+
+---
+## 3.6 明文型別
+
+
+### 3.6.1 明文型別 - 推論機制 
+
